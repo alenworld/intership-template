@@ -3,6 +3,11 @@ require('dotenv').config();
 module.exports = {
   BASE_URL: process.env.BASE_URL,
   PORT: process.env.PORT || 3000,
+  TELEGRAM_BOT: {
+    TOKEN: process.env.TELEGRAM_BOT_TOKEN,
+    HOOK_PATH: `/token${process.env.TELEGRAM_BOT_TOKEN}`,
+    DOMAIN: process.env.TELEGRAM_BOT_DOMAIN,
+  },
   NODE_ENV: process.env.NODE_ENV,
   MONGO_URI: process.env.NODE_ENV === 'production' ? process.env.MONGO_URI : process.env.MONGO_URI_LOCAL,
   HASH_SALT: 3,
