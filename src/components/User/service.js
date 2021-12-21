@@ -19,7 +19,7 @@ function findAll() {
  * @returns {Promise<UserModel>}
  */
 function findById(id) {
-  return UserModel.findById(id);
+  return UserModel.findById(id).lean();
 }
 
 /**
@@ -42,8 +42,8 @@ function create(profile) {
  * @summary update a user's profile
  * @returns {Promise<void>}
  */
-function updateById(_id, newProfile) {
-  return UserModel.updateOne({ _id }, newProfile);
+function updateById(newProfile) {
+  return UserModel.updateOne({ newProfile._id }, newProfile);
 }
 
 /**
@@ -54,7 +54,7 @@ function updateById(_id, newProfile) {
  * @returns {Promise<UserModel>}
  */
 function searchByEmail(email) {
-  return UserModel.findOne({ email });
+  return UserModel.findOne({ email }).lean();
 }
 
 /**

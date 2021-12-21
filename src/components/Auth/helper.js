@@ -1,6 +1,4 @@
 const jwt = require('jsonwebtoken');
-const ejs = require('ejs');
-const path = require('path');
 const nodemailer = require('nodemailer');
 const AuthService = require('./service');
 const { JWT, MAILER } = require('../../config/credentials');
@@ -35,9 +33,6 @@ const sendEmail = async (email, subject, html) => {
   try {
     const transporter = nodemailer.createTransport({
       service: MAILER.service,
-      // host: MAILER.host,
-      // port: MAILER.port,
-      // secure: MAILER.secure,
       auth: {
         user: MAILER.auth.user,
         pass: MAILER.auth.pass,

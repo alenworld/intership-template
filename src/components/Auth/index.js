@@ -2,10 +2,11 @@ const bcrypt = require('bcrypt');
 const ejs = require('ejs');
 const path = require('path');
 const UserService = require('../User/service');
-const UserValidation = require('../User/validation');
 const AuthService = require('./service');
 const AuthValidation = require('./validation');
-const { HASH_SALT, BASE_URL, PORT } = require('../../config/credentials');
+const {
+  HASH_SALT, BASE_URL, PORT, JWT,
+} = require('../../config/credentials');
 const { generateTokens, updateOrSaveToken, sendEmail } = require('./helper');
 const { ValidationError } = require('../../error');
 
@@ -18,7 +19,7 @@ const { ValidationError } = require('../../error');
  */
 async function signUp(req, res, next) {
   try {
-    const { error, value } = UserValidation.create(req.body);
+    const { error, value } = AuthValidation.signUp(req.body);
 
     if (error) {
       throw new ValidationError(error.details);
@@ -40,12 +41,14 @@ async function signUp(req, res, next) {
 
     const user = await UserService.create(userData);
 
-    return res.status(201).json({
-      data: user,
+    res.render('welcome', {
+      data: {
+        firstName: user.firstName,
+      },
     });
   } catch (error) {
     if (error instanceof ValidationError) {
-      return res.status(422).json({
+      res.status(422).json({
         message: error.name,
         details: error.message,
       });
@@ -56,7 +59,7 @@ async function signUp(req, res, next) {
       details: error.message,
     });
 
-    return next(error);
+    next(error);
   }
 }
 
@@ -76,6 +79,7 @@ async function signIn(req, res, next) {
     }
 
     const user = await UserService.searchByEmail(value.email);
+
     if (user === null) {
       throw new Error('User does not exists!');
     }
@@ -86,13 +90,18 @@ async function signIn(req, res, next) {
 
     const tokens = generateTokens(user);
 
-    updateOrSaveToken(user._id, tokens.refreshToken);
-    return res.status(200).json({
-      data: tokens,
-    });
+    updateOrSaveToken(user.id, tokens.refreshToken);
+
+    res
+      .status(200)
+      .cookie('accessToken', `Bearer ${tokens.accessToken}`, {
+        maxAge: 1000 * 60 * 30, httpOnly: true,
+      })
+      .cookie('refreshToken', tokens.refreshToken, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true })
+      .redirect(301, '/v1/users');
   } catch (error) {
     if (error instanceof ValidationError) {
-      return res.status(422).json({
+      res.status(422).json({
         message: error.name,
         details: error.message,
       });
@@ -103,7 +112,7 @@ async function signIn(req, res, next) {
       details: error.message,
     });
 
-    return next(error);
+    next(error);
   }
 }
 
@@ -116,29 +125,33 @@ async function signIn(req, res, next) {
  */
 async function refreshToken(req, res, next) {
   try {
-    const { error, value } = AuthValidation.refreshToken(req.body);
-
+    const { error, value } = AuthValidation.Tokens(req.cookies);
     if (error) {
       throw new ValidationError(error.details);
     }
 
-    const requestToken = await AuthService.searchTokenByUserId(value.userId);
+    const requestToken = await AuthService.searchToken(value.refreshToken);
 
-    if (requestToken.token !== value.token) {
+    if (requestToken === null) {
       throw new Error('Token is invalid');
     }
 
-    const user = await UserService.findById(value.userId);
+    const user = await UserService.findById(requestToken.userId);
 
     const tokens = generateTokens(user);
-    updateOrSaveToken(value.userId, tokens.refreshToken);
 
-    return res.status(200).json({
-      newdata: tokens,
-    });
+    updateOrSaveToken(user.id, tokens.refreshToken);
+
+    res
+      .status(200)
+      .cookie('accessToken', `Bearer ${tokens.accessToken}`, {
+        maxAge: 1000 * 60 * 30, httpOnly: true,
+      })
+      .cookie('refreshToken', tokens.refreshToken, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true })
+      .redirect('back');
   } catch (error) {
     if (error instanceof ValidationError) {
-      return res.status(422).json({
+      res.status(422).json({
         message: error.name,
         details: error.message,
       });
@@ -149,7 +162,7 @@ async function refreshToken(req, res, next) {
       details: error.message,
     });
 
-    return next(error);
+    next(error);
   }
 }
 
@@ -184,14 +197,16 @@ async function forgotPassword(req, res, next) {
 
     sendEmail(user.email, 'Password reset', html);
 
-    return res.render('forgot-reset-success', {
-      data: {
-        message: 'Email sent successfully. Check spam folder also',
-      },
-    });
+    res
+      .status(200)
+      .render('forgot-reset-success', {
+        data: {
+          message: 'Email sent successfully. Check spam folder also',
+        },
+      });
   } catch (error) {
     if (error instanceof ValidationError) {
-      return res.status(422).json({
+      res.status(422).json({
         message: error.name,
         details: error.message,
       });
@@ -202,7 +217,7 @@ async function forgotPassword(req, res, next) {
       details: error.message,
     });
 
-    return next(error);
+    next(error);
   }
 }
 
@@ -227,14 +242,14 @@ async function resetPassword(req, res, next) {
 
     await UserService.updateById(token.userId, { password: hashPassword });
 
-    return res.render('forgot-reset-success', {
+    res.render('forgot-reset-success', {
       data: {
-        message: 'Password changed successfully.',
+        message: 'Password changed',
       },
     });
   } catch (error) {
     if (error instanceof ValidationError) {
-      return res.status(422).json({
+      res.status(422).json({
         message: error.name,
         details: error.message,
       });
@@ -245,7 +260,7 @@ async function resetPassword(req, res, next) {
       details: error.message,
     });
 
-    return next(error);
+    next(error);
   }
 }
 
