@@ -38,13 +38,13 @@ async function findAll(req, res, next) {
  */
 async function findById(req, res, next) {
   try {
-    const { error } = UserValidation.findById(req.params);
+    const { error, value } = UserValidation.findById(req.params);
 
     if (error) {
       throw new ValidationError(error.details);
     }
 
-    const user = await UserService.findById(req.params.id);
+    const user = await UserService.findById(value.id);
 
     res.status(200).json({
       data: user,
@@ -75,13 +75,13 @@ async function findById(req, res, next) {
  */
 async function updateById(req, res, next) {
   try {
-    const { error } = UserValidation.updateById(req.body);
+    const { error, value } = UserValidation.updateById(req.body);
 
     if (error) {
       throw new ValidationError(error.details);
     }
 
-    const updatedUser = await UserService.updateById(req.body.id, req.body);
+    const updatedUser = await UserService.updateById(value);
 
     res.status(200).json({
       data: updatedUser,
@@ -112,13 +112,13 @@ async function updateById(req, res, next) {
  */
 async function deleteById(req, res, next) {
   try {
-    const { error } = UserValidation.deleteById(req.body);
+    const { error, value } = UserValidation.deleteById(req.body);
 
     if (error) {
       throw new ValidationError(error.details);
     }
 
-    const deletedUser = await UserService.deleteById(req.body.id);
+    const deletedUser = await UserService.deleteById(value.id);
 
     res.status(200).json({
       data: deletedUser,

@@ -42,8 +42,8 @@ function create(profile) {
  * @summary update a user's profile
  * @returns {Promise<void>}
  */
-function updateById(_id, newProfile) {
-  return UserModel.updateOne({ _id }, newProfile);
+function updateById(newProfile) {
+  return UserModel.updateOne({ newProfile._id }, newProfile);
 }
 
 /**
