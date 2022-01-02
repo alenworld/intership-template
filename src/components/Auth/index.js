@@ -99,7 +99,7 @@ async function refreshToken(req, res, next) {
 
     if (requestToken === null) throw new Error('Token is invalid');
 
-    const user = await UserService.findById({ token: requestToken.userId });
+    const user = await UserService.findById(requestToken.userId);
 
     const tokens = generateTokens(user);
 
@@ -111,7 +111,7 @@ async function refreshToken(req, res, next) {
         maxAge: 1000 * 60 * 30, httpOnly: true,
       })
       .cookie('refreshToken', tokens.refreshToken, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true })
-      .redirect('/v1/users');
+      .redirect('/chatroom');
   } catch (error) {
     next(error);
   }

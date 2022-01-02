@@ -43,7 +43,7 @@ router
  * @param {string} path - Express path
  * @param {callback} middleware - Express middleware.
  */
-router.get('/refreshtoken', AuthMiddleware, AuthComponent.refreshToken);
+router.get('/refreshtoken', AuthComponent.refreshToken);
 
 /**
  * Route serving forgot password
