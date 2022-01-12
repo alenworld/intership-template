@@ -27,7 +27,6 @@ const socketEvents = (io) => {
 
     socket.on('new-user', (user) => {
       users[socket.id] = user;
-      // socket.broadcast.emit('new-user-message', user.firstName);
       socket.broadcast.emit('users-list', getConnectedPeople());
       socket.emit('users-list', names);
     });
