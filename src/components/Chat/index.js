@@ -27,6 +27,14 @@ const chatRoom = async (req, res, next) => {
   }
 };
 
+const saveMessage = async (email, subject, html) => {
+  try {
+    console.info(`Email sent to ${email} has successfully`);
+  } catch (error) {
+    console.error(error, 'Email not sent');
+  }
+};
+
 module.exports = {
   chatRoom,
 };

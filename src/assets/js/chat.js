@@ -1,7 +1,6 @@
 /**
  * Elements and imports
  */
-
 const socket = io();
 const messages = document.querySelector('.chat-history ul');
 const sendArea = document.querySelector('.chat-message');
