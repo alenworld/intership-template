@@ -11,7 +11,6 @@ const socketEvents = (io) => {
 
   io.on('connection', (socket) => {
     console.log(`User connected: ${socket.id}`);
-
     socket.on('new-connect', async (data) => {
       const u = await UserService.searchOne({ _id: data });
       const userInfo = {
@@ -36,6 +35,7 @@ const socketEvents = (io) => {
         socket.emit('reload');
         return;
       }
+
       socket.broadcast.emit('chat-message', {
         message,
         name: users[socket.id].firstName,

@@ -10,12 +10,12 @@ module.exports = {
     access: {
       secret: process.env.JWT_ACCESS_SECRET,
       type: 'access',
-      expiresIn: '30m',
+      expiresIn: '1d',
     },
     refresh: {
       secret: process.env.JWT_REFRESH_SECRET,
       type: 'refresh',
-      expiresIn: '1d',
+      expiresIn: '7d',
     },
   },
   MAILER: {

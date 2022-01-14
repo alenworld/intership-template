@@ -79,23 +79,44 @@ ul li {
     border-bottom: 2px solid white;
 }
 
-.chat .chat-header img {
-    float: left;
-}
-
 .chat .chat-header .chat-about {
     float: left;
     padding-left: 10px;
     margin-top: 6px;
 }
 
-.chat .chat-header .chat-with {
+.chat .chat-header .chat-num-online {
     font-weight: bold;
     font-size: 16px;
 }
 
 .chat .chat-header .chat-num-messages {
     color: #92959e;
+}
+
+.chat .chat-header .people-list-online-images {
+    float: right;
+    padding-right: 10px;
+}
+
+.chat .chat-header .people-list-online-image:first-child {
+    margin-right: 0;
+}
+
+.chat .chat-header .people-list-online-image {
+    float: right;
+    margin-right: -12px;
+}
+
+.chat .chat-header .people-list-online-image {
+    border-radius: 50%;
+    border: 2px solid rgb(29, 168, 29);
+    background-size: cover;
+}
+
+.chat .chat-header .people-list-online-image {
+    width: 55px;
+    height: 55px;
 }
 
 .chat .chat-header .fa-star {

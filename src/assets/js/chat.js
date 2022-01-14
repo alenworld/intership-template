@@ -4,17 +4,25 @@
 
 const socket = io();
 const messages = document.querySelector('.chat-history ul');
-// Send message form
 const sendArea = document.querySelector('.chat-message');
 const textArea = document.getElementById('message-to-send');
 const connectedList = document.querySelector('.people-list ul');
 const typing = document.getElementById('typing');
-
+const chatAbout = document.querySelector('.chat-about');
+const onlineInfo = document.getElementById('online-info');
 const idValue = document.getElementById('user_id').textContent;
-
 /**
  * Functions
  */
+
+const appendOnlineInfo = (num) => {
+  let u;
+  if (num === 1) u = 'user';
+  else u = 'users';
+  onlineInfo.textContent = `${num} ${u} online`;
+
+  chatAbout.prepend(onlineInfo);
+};
 
 const appendUser = (user) => {
   const connectedUser = document.createElement('li');
@@ -38,7 +46,7 @@ const appendUser = (user) => {
   connectedList.appendChild(connectedUser);
 };
 
-const appendMessage = (message, sender) => { // if sender is true, he is own who wrote the message
+const appendMessage = (message, sender, own) => { // if sender is true, he is own who wrote the message
   const item = document.createElement('li');
   if (sender === true) {
     item.classList.add('clearfix');
@@ -54,11 +62,14 @@ const appendMessage = (message, sender) => { // if sender is true, he is own who
   const dataName = document.createElement('span');
   dataName.setAttribute('class', 'message-data-name');
 
-  dataName.innerHTML = `${sender}`;
-
-  if (sender !== true) {
+  if (sender === true) {
+    dataName.innerHTML = `${own}`;
+    messageData.appendChild(dataName);
+  } else {
+    dataName.innerHTML = `${sender}`;
     messageData.appendChild(dataName);
   }
+
   const dataTime = document.createElement('span');
   dataTime.setAttribute('class', 'message-data-time');
   const timeValue = document.createTextNode(`${new Date().toLocaleString('en-US', {
@@ -74,7 +85,7 @@ const appendMessage = (message, sender) => { // if sender is true, he is own who
 
   // if sender === true -> insert before time then name
   if (sender === true) {
-    dataName.innerHTML = '';
+    dataName.innerHTML = ` ${own}`;
     messageData.appendChild(dataName);
   }
 
@@ -108,10 +119,15 @@ socket.on('new-connect', (userInfo) => {
   socket.emit('new-user', userInfo);
 });
 
+socket.on('users-online-amount', (num) => {
+  appendOnlineInfo(num);
+});
+
 socket.on('users-list', (users) => {
   while (connectedList.firstChild) {
     connectedList.firstChild.remove();
   }
+  appendOnlineInfo(users.length);
   users.forEach((user) => {
     appendUser(user);
   });
@@ -122,12 +138,12 @@ socket.on('chat-message', (data) => {
 });
 
 socket.on('reload', () => {
-  window.location.reload();
+  document.location.reload();
 });
 
 socket.on('user-typing', (data) => {
   typing.textContent = `${data.firstName} is typing...`;
-  setTimeout(() => { typing.textContent = ''; }, 2000);
+  setTimeout(() => { typing.textContent = ''; }, 2300);
 });
 
 /**
@@ -138,11 +154,12 @@ sendArea.querySelector('button').addEventListener('click', (event) => {
   event.preventDefault();
 
   const message = textArea.value;
+  const me = 'ME';
 
   if (message.length !== 0) {
     socket.emit('send-chat-message', message);
     textArea.value = '';
-    appendMessage(`${message}`, true);
+    appendMessage(`${message}`, true, `${me}`);
   }
 });
 

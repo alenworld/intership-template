@@ -24,7 +24,7 @@ async function signUp(req, res, next) {
 
     if (error) throw new ValidationError(error.details);
 
-    const isUser = UserService.isExists(value.email);
+    const isUser = await UserService.isExists({ email: value.email });
 
     if (isUser) throw new Error('Email already exists!');
 
@@ -39,11 +39,9 @@ async function signUp(req, res, next) {
 
     const user = await UserService.create(userData);
 
-    res.render('welcome', {
-      data: {
-        firstName: user.firstName,
-      },
-    });
+    res
+      .status(200)
+      .redirect('/', { firstName: user.firstName });
   } catch (error) {
     next(error);
   }
@@ -75,9 +73,9 @@ async function signIn(req, res, next) {
     res
       .status(200)
       .cookie('accessToken', `Bearer ${tokens.accessToken}`, {
-        maxAge: 1000 * 60 * 30, httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24, httpOnly: true,
       })
-      .cookie('refreshToken', tokens.refreshToken, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true })
+      .cookie('refreshToken', tokens.refreshToken, { maxAge: 1000 * 60 * 60 * 24 * 30, httpOnly: true })
       .cookie('user_id', `${user._id}`)
       .redirect('/');
   } catch (error) {

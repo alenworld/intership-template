@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>SocketsChat</title>
     <link rel='stylesheet' href="assets/css/chat.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
-
 <body>
     <div class="container clearfix">
         <div class="people-list" id="people-list">
@@ -25,19 +23,20 @@
                     </div>
                 </li>
             </ul>
-            <div id="user_id" style="text-align: center;"><%- user_id %></div>
+            <div id="user_id" style="text-align: center;"><%= user_id %></div>
         </div>
 
         <div class="chat">
             <div class="chat-header clearfix">
-                <img src="/assets/chat_avatar.jpg" alt="avatar" />
-
                 <div class="chat-about">
-                    <div class="chat-with">Chat with Vincent Porter</div>
-
-                    <div class="chat-num-messages">already 1 902 messages</div>
+                    <div id="online-info" class="chat-num-online"></div>
+                    <!-- <div class="chat-num-messages">already 1 902 messages</div> -->
                     <div id="typing"></div>
-                    
+                </div>
+                <div class="people-list-online-images">
+                    <a class="people-list-online-image" title="Name Name" style="background-image: url('/assets/def.jpg')"></a>
+                    <a class="people-list-online-image" title="Name Name" style="background-image: url('/assets/def.jpg')"></a>
+                    <a class="people-list-online-image" title="Name Name" style="background-image: url('/assets/def.jpg')"></a>
                 </div>
             </div> <!-- end chat-header -->
 
